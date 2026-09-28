@@ -1,0 +1,7 @@
+# PocketSmart AI: Dependencies
+# Note: PocketSmart AI is built to run out-of-the-box with ZERO external dependencies
+# using Python 3 standard library (http.server, sqlite3, json, urllib, datetime).
+#
+# Optional packages for enhanced deployment or extended AI capabilities:
+google-genai>=0.1.1
+requests>=2.31.0
