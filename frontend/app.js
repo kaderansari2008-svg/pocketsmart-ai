@@ -153,46 +153,475 @@ function showToast(message, type = 'success') {
 }
 
 // ==========================================================================
-// API Helpers
+// Local Engine for Standalone / GitHub Pages Client-Side Execution
+// ==========================================================================
+const LocalEngine = {
+  isStaticHost: window.location.hostname.endsWith('github.io') || window.location.protocol === 'file:',
+  
+  getStore() {
+    let data = localStorage.getItem('pocketsmart_local_db');
+    if (!data) {
+      data = this.initSeedData();
+    } else {
+      try { data = JSON.parse(data); } catch(e) { data = this.initSeedData(); }
+    }
+    return data;
+  },
+
+  saveStore(data) {
+    localStorage.setItem('pocketsmart_local_db', JSON.stringify(data));
+  },
+
+  initSeedData() {
+    const today = new Date();
+    const dStr = (day) => {
+      const d = new Date(today.getFullYear(), today.getMonth(), day);
+      return d.toISOString().split('T')[0];
+    };
+    const seed = {
+      monthlyIncome: 3850.0,
+      categories: [
+        { name: "Housing & Rent", group_type: "need", monthly_budget: 1200.0, color: "#3b82f6" },
+        { name: "Groceries", group_type: "need", monthly_budget: 450.0, color: "#10b981" },
+        { name: "Utilities & Bills", group_type: "need", monthly_budget: 200.0, color: "#f59e0b" },
+        { name: "Healthcare & Meds", group_type: "need", monthly_budget: 150.0, color: "#ec4899" },
+        { name: "Transportation", group_type: "need", monthly_budget: 250.0, color: "#6366f1" },
+        { name: "Dining & Cafes", group_type: "want", monthly_budget: 300.0, color: "#f97316" },
+        { name: "Shopping & Gear", group_type: "want", monthly_budget: 250.0, color: "#a855f7" },
+        { name: "Entertainment & Media", group_type: "want", monthly_budget: 150.0, color: "#8b5cf6" },
+        { name: "Personal & Grooming", group_type: "want", monthly_budget: 100.0, color: "#06b6d4" },
+        { name: "Emergency Fund", group_type: "saving", monthly_budget: 400.0, color: "#14b8a6" },
+        { name: "Investments", group_type: "saving", monthly_budget: 350.0, color: "#10b981" }
+      ],
+      transactions: [
+        { id: 1, date: dStr(1), amount: 1925.0, type: "income", category: "Salary", merchant: "Primary Employer", note: "Bi-weekly paycheck", payment_method: "Direct Deposit" },
+        { id: 2, date: dStr(15), amount: 1925.0, type: "income", category: "Salary", merchant: "Primary Employer", note: "Bi-weekly paycheck", payment_method: "Direct Deposit" },
+        { id: 3, date: dStr(2), amount: 1150.0, type: "expense", category: "Housing & Rent", merchant: "Downtown Properties", note: "Monthly Rent", payment_method: "Bank Transfer" },
+        { id: 4, date: dStr(3), amount: 112.45, type: "expense", category: "Groceries", merchant: "Trader Joe's", note: "Weekly fresh groceries", payment_method: "Card" },
+        { id: 5, date: dStr(4), amount: 85.40, type: "expense", category: "Utilities & Bills", merchant: "Power & Light", note: "Electricity bill", payment_method: "Auto-debit" },
+        { id: 6, date: dStr(5), amount: 14.50, type: "expense", category: "Dining & Cafes", merchant: "Blue Bottle Coffee", note: "Latte & pastry", payment_method: "Apple Pay" },
+        { id: 7, date: dStr(7), amount: 48.00, type: "expense", category: "Transportation", merchant: "Chevron Gas", note: "Gas refill", payment_method: "Card" },
+        { id: 8, date: dStr(8), amount: 38.00, type: "expense", category: "Dining & Cafes", merchant: "Ramen Nagi", note: "Dinner with friend", payment_method: "Card" },
+        { id: 9, date: dStr(9), amount: 49.99, type: "expense", category: "Shopping & Gear", merchant: "Amazon.com", note: "Desk accessories", payment_method: "Card" },
+        { id: 10, date: dStr(10), amount: 88.30, type: "expense", category: "Groceries", merchant: "Whole Foods", note: "Mid-week groceries", payment_method: "Card" },
+        { id: 11, date: dStr(11), amount: 45.00, type: "expense", category: "Healthcare & Meds", merchant: "City Gym", note: "Monthly membership", payment_method: "Auto-debit" },
+        { id: 12, date: dStr(12), amount: 18.25, type: "expense", category: "Dining & Cafes", merchant: "Chipotle", note: "Lunch burrito bowl", payment_method: "Card" },
+        { id: 13, date: dStr(16), amount: 75.00, type: "expense", category: "Shopping & Gear", merchant: "Uniqlo", note: "Autumn clothes", payment_method: "Card" },
+        { id: 14, date: dStr(2), amount: 250.00, type: "expense", category: "Emergency Fund", merchant: "High Yield Savings", note: "Monthly savings deposit", payment_method: "Transfer" },
+        { id: 15, date: dStr(16), amount: 200.00, type: "expense", category: "Investments", merchant: "Vanguard S&P 500", note: "Index fund DCA", payment_method: "Transfer" }
+      ],
+      goals: [
+        { id: 1, name: "Emergency Buffer", target_amount: 3000.0, current_amount: 1850.0, target_date: dStr(28) },
+        { id: 2, name: "Next-Gen M-Series Laptop", target_amount: 1600.0, current_amount: 850.0, target_date: dStr(25) },
+        { id: 3, name: "Summer Mountain Trip", target_amount: 900.0, current_amount: 420.0, target_date: dStr(30) }
+      ],
+      subscriptions: [
+        { id: 1, name: "Netflix Premium 4K", cost: 22.99, billing_cycle: "monthly", category: "Entertainment & Media", status: "active" },
+        { id: 2, name: "Spotify Family", cost: 16.99, billing_cycle: "monthly", category: "Entertainment & Media", status: "active" },
+        { id: 3, name: "City Gym Membership", cost: 45.00, billing_cycle: "monthly", category: "Healthcare & Meds", status: "active" },
+        { id: 4, name: "GitHub Copilot / AI Cloud", cost: 10.00, billing_cycle: "monthly", category: "Shopping & Gear", status: "active" },
+        { id: 5, name: "Unused Streaming Trial", cost: 9.99, billing_cycle: "monthly", category: "Entertainment & Media", status: "review" }
+      ],
+      affordabilityHistory: [
+        {
+          id: 1,
+          item_name: "Sony WH-1000XM5 Noise Cancelling Headphones",
+          price: 348.00,
+          category: "Shopping & Gear",
+          verdict: "Caution / Stretch",
+          affordability_score: 58,
+          created_at: new Date().toISOString()
+        }
+      ]
+    };
+    this.saveStore(seed);
+    return seed;
+  },
+
+  getSummary() {
+    const db = this.getStore();
+    let totalIncome = 0;
+    let totalExpenses = 0;
+    const groupSpending = { need: 0, want: 0, saving: 0 };
+    const categorySpending = {};
+
+    db.categories.forEach(c => {
+      categorySpending[c.name] = {
+        spent: 0,
+        budget: c.monthly_budget,
+        group_type: c.group_type,
+        color: c.color,
+        remaining: c.monthly_budget,
+        percent_used: 0
+      };
+    });
+
+    db.transactions.forEach(t => {
+      const amt = parseFloat(t.amount) || 0;
+      if (t.type === 'income') {
+        totalIncome += amt;
+      } else if (t.type === 'expense') {
+        totalExpenses += amt;
+        if (categorySpending[t.category]) {
+          categorySpending[t.category].spent += amt;
+          const b = categorySpending[t.category].budget;
+          categorySpending[t.category].remaining = b - categorySpending[t.category].spent;
+          categorySpending[t.category].percent_used = b > 0 ? Math.round((categorySpending[t.category].spent / b) * 100) : 100;
+          const g = categorySpending[t.category].group_type;
+          groupSpending[g] = (groupSpending[g] || 0) + amt;
+        } else {
+          categorySpending[t.category] = {
+            spent: amt,
+            budget: 0,
+            group_type: "want",
+            color: "#94a3b8",
+            remaining: -amt,
+            percent_used: 100
+          };
+          groupSpending.want += amt;
+        }
+      }
+    });
+
+    const effectiveIncome = totalIncome > 0 ? totalIncome : db.monthlyIncome;
+    const netSavings = effectiveIncome - totalExpenses;
+    const savingsRate = effectiveIncome > 0 ? Math.round((netSavings / effectiveIncome) * 1000) / 10 : 0;
+    
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const daysRemaining = Math.max(1, daysInMonth - now.getDate());
+    const dailyBurnRate = Math.round((totalExpenses / Math.max(1, now.getDate())) * 100) / 100;
+    const projectedSpend = Math.round(dailyBurnRate * daysInMonth * 100) / 100;
+
+    let healthScore = 89;
+    if (savingsRate < 10) healthScore -= 25;
+    else if (savingsRate < 20) healthScore -= 10;
+    if (netSavings < 0) healthScore -= 30;
+    healthScore = Math.max(20, Math.min(98, healthScore));
+    const healthStatus = healthScore >= 80 ? "Excellent" : (healthScore >= 65 ? "Good" : (healthScore >= 50 ? "Fair" : "Attention Needed"));
+
+    return {
+      effective_income: effectiveIncome,
+      total_expenses: totalExpenses,
+      net_savings: netSavings,
+      savings_rate_pct: savingsRate,
+      days_remaining: daysRemaining,
+      daily_burn_rate: dailyBurnRate,
+      projected_monthly_spend: projectedSpend,
+      health_score: healthScore,
+      health_status: healthStatus,
+      fifty_thirty_twenty: {
+        needs: {
+          spent: groupSpending.need,
+          target_pct: 50,
+          actual_pct: effectiveIncome > 0 ? Math.round((groupSpending.need / effectiveIncome) * 1000) / 10 : 0,
+          target_amount: effectiveIncome * 0.5
+        },
+        wants: {
+          spent: groupSpending.want,
+          target_pct: 30,
+          actual_pct: effectiveIncome > 0 ? Math.round((groupSpending.want / effectiveIncome) * 1000) / 10 : 0,
+          target_amount: effectiveIncome * 0.3
+        },
+        savings: {
+          spent: groupSpending.saving,
+          target_pct: 20,
+          actual_pct: effectiveIncome > 0 ? Math.round((groupSpending.saving / effectiveIncome) * 1000) / 10 : 0,
+          target_amount: effectiveIncome * 0.2
+        }
+      },
+      category_spending: categorySpending
+    };
+  },
+
+  evaluateAffordability(payload) {
+    const summary = this.getSummary();
+    const price = parseFloat(payload.price);
+    const installments = Math.max(1, parseInt(payload.installments) || 1);
+    const monthlyCost = Math.round((price / installments) * 100) / 100;
+    const cat = summary.category_spending[payload.category] || { remaining: 200, budget: 200 };
+
+    let score = 100;
+    const reasons = [];
+    const recommendations = [];
+    const alternatives = [];
+
+    if (monthlyCost > summary.net_savings) {
+      score -= 45;
+      reasons.push(`Exceeds your remaining monthly surplus by $${(monthlyCost - summary.net_savings).toFixed(2)}.`);
+    } else if (monthlyCost > (summary.net_savings * 0.7)) {
+      score -= 20;
+      reasons.push(`Consumes over 70% of your remaining uncommitted savings buffer.`);
+    } else {
+      reasons.push(`Fits within your projected monthly surplus ($${summary.net_savings.toFixed(2)} available).`);
+    }
+
+    if (monthlyCost > cat.remaining) {
+      score -= 30;
+      reasons.push(`Exceeds remaining '${payload.category}' category budget by $${(monthlyCost - cat.remaining).toFixed(2)}.`);
+    } else {
+      reasons.push(`Category '${payload.category}' has sufficient room ($${cat.remaining.toFixed(2)} left).`);
+    }
+
+    if (payload.urgency === "essential_need") {
+      score = Math.min(98, score + 15);
+      reasons.push("Essential Need: given priority consideration.");
+    } else if (payload.urgency === "impulse_want") {
+      score = Math.max(15, score - 15);
+      reasons.push("Impulse Want: cooling-off period recommended.");
+    }
+
+    score = Math.max(10, Math.min(98, score));
+
+    let verdict = "Safe to Buy";
+    let badge = "success";
+    let headline = `Yes, you can comfortably afford the ${payload.item_name}!`;
+
+    if (score < 50) {
+      verdict = "High Risk / Not Recommended";
+      badge = "danger";
+      headline = `PocketSmart AI advises against purchasing the ${payload.item_name} right now.`;
+      recommendations.push("This purchase will trigger a deficit in your monthly budget and eat into emergency reserves.");
+      recommendations.push(`Smart Goal: Set aside $${Math.max(20, Math.round(price / 6))}/week for 6 weeks.`);
+      alternatives.push("Explore certified refurbished alternatives or defer until your next income boost.");
+    } else if (score < 75) {
+      verdict = "Caution / Stretch";
+      badge = "warning";
+      headline = `You can afford the ${payload.item_name}, but it will stretch your discretionary funds.`;
+      recommendations.push(`Wait ${summary.days_remaining} days until the next cycle to avoid a category deficit.`);
+      recommendations.push(`Trade-off: Temporarily reduce Dining & Cafes by $${(monthlyCost * 0.3).toFixed(2)} to offset.`);
+      alternatives.push("Look for open-box deals or promotional coupon discounts.");
+    } else {
+      recommendations.push("Your cashflow and category limits support this purchase without jeopardizing your savings.");
+      recommendations.push("Tip: Pay in full with cash/card rather than high-interest financing.");
+    }
+
+    // Save evaluation to history
+    const db = this.getStore();
+    db.affordabilityHistory = db.affordabilityHistory || [];
+    db.affordabilityHistory.unshift({
+      id: Date.now(),
+      item_name: payload.item_name,
+      price: price,
+      category: payload.category,
+      urgency: payload.urgency,
+      verdict: verdict,
+      affordability_score: score,
+      created_at: new Date().toISOString()
+    });
+    this.saveStore(db);
+
+    return {
+      item_name: payload.item_name,
+      price: price,
+      category: payload.category,
+      urgency: payload.urgency,
+      installments: installments,
+      monthly_cost: monthlyCost,
+      score: score,
+      verdict: verdict,
+      verdict_badge: badge,
+      summary_sentence: headline,
+      reasons: reasons,
+      recommendations: recommendations,
+      alternatives: alternatives
+    };
+  },
+
+  parseNl(text) {
+    const lower = text.toLowerCase();
+    const isIncome = /(salary|paycheck|income|deposit|received|got paid)/.test(lower);
+    
+    let amount = 0;
+    const match = text.match(/(?:\$)?([0-9]+(?:\.[0-9]{1,2})?)/);
+    if (match) amount = parseFloat(match[1]);
+
+    let category = isIncome ? "Salary" : "Shopping & Gear";
+    if (/(grocery|groceries|trader joe|whole foods|market|food)/.test(lower)) category = "Groceries";
+    else if (/(lunch|dinner|breakfast|coffee|cafe|starbucks|chipotle|ramen|restaurant|burger)/.test(lower)) category = "Dining & Cafes";
+    else if (/(rent|apartment|lease)/.test(lower)) category = "Housing & Rent";
+    else if (/(electric|power|bill|utility|wifi|internet)/.test(lower)) category = "Utilities & Bills";
+    else if (/(gas|fuel|chevron|shell|uber|lyft|metro|transit)/.test(lower)) category = "Transportation";
+    else if (/(gym|pharmacy|medicine|cvs)/.test(lower)) category = "Healthcare & Meds";
+
+    let merchant = category;
+    const mMatch = text.match(/\b(?:at|from)\s+([A-Za-z0-9' -]+?)(?:\s+(?:yesterday|today|\$)|$)/i);
+    if (mMatch) merchant = mMatch[1].trim();
+
+    return {
+      raw_text: text,
+      type: isIncome ? "income" : "expense",
+      amount: amount,
+      category: category,
+      merchant: merchant,
+      date: new Date().toISOString().split('T')[0],
+      note: text
+    };
+  },
+
+  chat(message) {
+    const summary = this.getSummary();
+    const q = message.toLowerCase();
+    let reply = "";
+
+    if (q.includes("save") || q.includes("saving") || q.includes("cut")) {
+      reply = `### 💡 PocketSmart AI Savings Blueprint\n\n* **Current Surplus:** You have **$${summary.net_savings.toFixed(2)}** in uncommitted cashflow (Savings Rate: **${summary.savings_rate_pct}%**).\n* **Action Step 1:** Audit recurring entertainment subscriptions to trim $30–$50 this month.\n* **Action Step 2:** Automatically direct 50% of your remaining surplus into your Emergency Fund.`;
+    } else if (q.includes("50/30/20") || q.includes("rule") || q.includes("ratio")) {
+      reply = `### 📊 50/30/20 Rule Breakdown\n\n* **Needs (Target 50%):** Currently at **${summary.fifty_thirty_twenty.needs.actual_pct}%**.\n* **Wants (Target 30%):** Currently at **${summary.fifty_thirty_twenty.wants.actual_pct}%**.\n* **Savings (Target 20%):** Currently at **${summary.fifty_thirty_twenty.savings.actual_pct}%**.\n\nYour budget distribution is in healthy alignment!`;
+    } else {
+      reply = `### 🤖 PocketSmart AI Co-Pilot\n\nHere is your real-time financial snapshot:\n* **Monthly Inflow:** $${summary.effective_income.toFixed(2)}\n* **Total Outflow:** $${summary.total_expenses.toFixed(2)}\n* **Net Surplus:** $${summary.net_savings.toFixed(2)}\n* **Health Score:** ${summary.health_score}/100 (${summary.health_status})\n\nYou can test planned purchases in the "Can I Afford This?" tab or log expenses with voice and natural language!`;
+    }
+
+    return { reply, engine: "pocketsmart-client-engine" };
+  }
+};
+
+// ==========================================================================
+// API Helpers (with Graceful Static / Local Fallback)
 // ==========================================================================
 async function apiGet(endpoint) {
-  try {
-    const res = await fetch(endpoint);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } catch (err) {
-    console.error(`API GET error on ${endpoint}:`, err);
-    showToast(`Error connecting to server: ${err.message}`, 'error');
-    return null;
+  if (!LocalEngine.isStaticHost) {
+    try {
+      const res = await fetch(endpoint);
+      if (res.ok) return await res.json();
+    } catch (err) {
+      console.warn(`Local server unreachable at ${endpoint}, falling back to client engine:`, err);
+    }
   }
+
+  // Client-side fallback handling
+  if (endpoint.startsWith('/api/summary')) {
+    return LocalEngine.getSummary();
+  } else if (endpoint.startsWith('/api/transactions')) {
+    const db = LocalEngine.getStore();
+    return { transactions: db.transactions };
+  } else if (endpoint.startsWith('/api/categories')) {
+    const db = LocalEngine.getStore();
+    return { categories: db.categories };
+  } else if (endpoint.startsWith('/api/savings-goals')) {
+    const db = LocalEngine.getStore();
+    return { goals: db.goals };
+  } else if (endpoint.startsWith('/api/subscriptions')) {
+    const db = LocalEngine.getStore();
+    let total = 0;
+    db.subscriptions.forEach(s => {
+      if (s.status !== 'cancelled') {
+        total += s.billing_cycle === 'monthly' ? s.cost * 12 : s.cost;
+      }
+    });
+    return { subscriptions: db.subscriptions, annual_leakage: Math.round(total * 100) / 100 };
+  } else if (endpoint.startsWith('/api/affordability/history')) {
+    const db = LocalEngine.getStore();
+    return { history: db.affordabilityHistory || [] };
+  }
+
+  return null;
 }
 
 async function apiPost(endpoint, data) {
-  try {
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } catch (err) {
-    console.error(`API POST error on ${endpoint}:`, err);
-    showToast(`Action failed: ${err.message}`, 'error');
-    return null;
+  if (!LocalEngine.isStaticHost) {
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) return await res.json();
+    } catch (err) {
+      console.warn(`Local server unreachable on POST ${endpoint}, falling back to client engine:`, err);
+    }
   }
+
+  // Client-side fallback handling
+  if (endpoint === '/api/affordability') {
+    return LocalEngine.evaluateAffordability(data);
+  } else if (endpoint === '/api/parse-nl') {
+    return LocalEngine.parseNl(data.text || '');
+  } else if (endpoint === '/api/transactions') {
+    const db = LocalEngine.getStore();
+    const newTx = {
+      id: Date.now(),
+      date: data.date || new Date().toISOString().split('T')[0],
+      amount: parseFloat(data.amount) || 0,
+      type: data.type || 'expense',
+      category: data.category || 'Shopping & Gear',
+      merchant: data.merchant || 'General',
+      note: data.note || '',
+      payment_method: data.payment_method || 'Card'
+    };
+    db.transactions.unshift(newTx);
+    LocalEngine.saveStore(db);
+    return { success: true, id: newTx.id };
+  } else if (endpoint === '/api/savings-goals') {
+    const db = LocalEngine.getStore();
+    const newGoal = {
+      id: Date.now(),
+      name: data.name,
+      target_amount: parseFloat(data.target_amount),
+      current_amount: parseFloat(data.current_amount || 0),
+      target_date: data.target_date || ''
+    };
+    db.goals.push(newGoal);
+    LocalEngine.saveStore(db);
+    return { success: true, id: newGoal.id };
+  } else if (endpoint.includes('/contribute')) {
+    const parts = endpoint.split('/');
+    const goalId = parseInt(parts[3]);
+    const db = LocalEngine.getStore();
+    const goal = db.goals.find(g => g.id === goalId);
+    if (goal) {
+      goal.current_amount = Math.max(0, goal.current_amount + (parseFloat(data.amount) || 0));
+      LocalEngine.saveStore(db);
+    }
+    return { success: true };
+  } else if (endpoint === '/api/subscriptions') {
+    const db = LocalEngine.getStore();
+    const newSub = {
+      id: Date.now(),
+      name: data.name,
+      cost: parseFloat(data.cost),
+      billing_cycle: data.billing_cycle,
+      category: data.category,
+      status: 'active'
+    };
+    db.subscriptions.push(newSub);
+    LocalEngine.saveStore(db);
+    return { success: true, id: newSub.id };
+  } else if (endpoint === '/api/chat') {
+    return LocalEngine.chat(data.message || '');
+  } else if (endpoint === '/api/reset-data') {
+    LocalEngine.initSeedData();
+    return { success: true };
+  }
+
+  return null;
 }
 
 async function apiDelete(endpoint) {
-  try {
-    const res = await fetch(endpoint, { method: 'DELETE' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } catch (err) {
-    console.error(`API DELETE error on ${endpoint}:`, err);
-    showToast(`Delete failed: ${err.message}`, 'error');
-    return null;
+  if (!LocalEngine.isStaticHost) {
+    try {
+      const res = await fetch(endpoint, { method: 'DELETE' });
+      if (res.ok) return await res.json();
+    } catch (err) {
+      console.warn(`Local server unreachable on DELETE ${endpoint}, falling back to client engine:`, err);
+    }
   }
+
+  if (endpoint.startsWith('/api/transactions/')) {
+    const id = parseInt(endpoint.split('/')[3]);
+    const db = LocalEngine.getStore();
+    db.transactions = db.transactions.filter(t => t.id !== id);
+    LocalEngine.saveStore(db);
+    return { success: true };
+  } else if (endpoint.startsWith('/api/subscriptions/')) {
+    const id = parseInt(endpoint.split('/')[3]);
+    const db = LocalEngine.getStore();
+    db.subscriptions = db.subscriptions.filter(s => s.id !== id);
+    LocalEngine.saveStore(db);
+    return { success: true };
+  }
+
+  return null;
 }
 
 // ==========================================================================
