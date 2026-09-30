@@ -2,14 +2,25 @@ import os
 import sys
 import json
 import mimetypes
+import webbrowser
+import threading
+import time
 from urllib.parse import urlparse, parse_qs
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
 
+# Ensure local backend dir is in sys.path
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+if CURRENT_DIR not in sys.path:
+    sys.path.insert(0, CURRENT_DIR)
+
 # Local imports
 from database import get_db, init_db
-from seed_data import seed_database
+from seed_data import seed_database, ensure_current_month_data
 from ai_engine import PocketSmartAI
+
+class ReusableHTTPServer(HTTPServer):
+    allow_reuse_address = True
 
 PORT = int(os.environ.get("PORT", 8080))
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
@@ -287,19 +298,68 @@ class PocketSmartHandler(BaseHTTPRequestHandler):
         else:
             self.send_error(404, "Endpoint not found")
 
-def run(port=PORT):
+def run(port=PORT, open_browser=True):
     init_db()
     seed_database()
-    server_address = ("", port)
-    httpd = HTTPServer(server_address, PocketSmartHandler)
-    print(f"🚀 PocketSmart AI Server running at http://localhost:{port}/")
-    print(f"📁 Serving frontend from {FRONTEND_DIR}")
+    ensure_current_month_data()
+    
+    httpd = None
+    actual_port = port
+    max_attempts = 10
+    
+    for offset in range(max_attempts):
+        candidate_port = port + offset
+        try:
+            httpd = ReusableHTTPServer(("", candidate_port), PocketSmartHandler)
+            actual_port = candidate_port
+            break
+        except OSError as e:
+            if e.errno in (48, 98): # Address already in use (macOS/Linux)
+                print(f"⚠️ Port {candidate_port} in use, trying next port...")
+                continue
+            raise
+            
+    if not httpd:
+        print(f"❌ Could not bind to any port between {port} and {port + max_attempts - 1}")
+        sys.exit(1)
+        
+    url = f"http://localhost:{actual_port}/"
+    print("\n" + "="*58)
+    print("🤖 POCKETSMART AI: Smart Budget & Recommendation Assistant")
+    print("="*58)
+    print(f"🚀 Server is live at: {url}")
+    print(f"📁 Serving frontend: {FRONTEND_DIR}")
+    print("💡 Perfect for recording your demo video!")
+    print("   Press Ctrl+C in terminal to stop.")
+    print("="*58 + "\n")
+
+    if open_browser:
+        def _open():
+            time.sleep(0.6)
+            try:
+                webbrowser.open_new_tab(url)
+            except Exception:
+                pass
+        t = threading.Thread(target=_open, daemon=True)
+        t.start()
+
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\nShutting down server.")
+        print("\nShutting down server cleanly.")
         httpd.server_close()
 
 if __name__ == "__main__":
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else PORT
-    run(port)
+    target_port = PORT
+    auto_open = True
+    
+    # Flexible argument parsing
+    for arg in sys.argv[1:]:
+        if arg.isdigit():
+            target_port = int(arg)
+        elif arg in ("--no-browser", "-n"):
+            auto_open = False
+        elif arg.startswith("--port="):
+            target_port = int(arg.split("=")[1])
+            
+    run(target_port, open_browser=auto_open)

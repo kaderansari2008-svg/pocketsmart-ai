@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🚀 Run PocketSmart AI (Demo Mode)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "⚙️ Debug Backend Server",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/server.py",
+      "args": ["--no-browser"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}

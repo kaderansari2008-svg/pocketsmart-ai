@@ -1,6 +1,54 @@
+import os
+import sys
 from datetime import datetime, timedelta
 import random
+
+# Ensure local backend dir is in sys.path
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+if CURRENT_DIR not in sys.path:
+    sys.path.insert(0, CURRENT_DIR)
+
 from database import get_db, init_db
+
+def ensure_current_month_data(conn=None):
+    close_at_end = False
+    if conn is None:
+        conn = get_db()
+        close_at_end = True
+    cursor = conn.cursor()
+    now = datetime.now()
+    curr_ym = now.strftime("%Y-%m")
+    
+    # Check if there are transactions for current month
+    cursor.execute("SELECT COUNT(*) FROM transactions WHERE strftime('%Y-%m', date) = ?", (curr_ym,))
+    count = cursor.fetchone()[0]
+    if count == 0:
+        cursor.execute("SELECT id, date FROM transactions")
+        rows = cursor.fetchall()
+        for r in rows:
+            old_date = r["date"]
+            day_part = old_date[8:10] if len(old_date) >= 10 else "01"
+            try:
+                day_int = min(int(day_part), 28)
+                new_date = f"{curr_ym}-{day_int:02d}"
+            except ValueError:
+                new_date = f"{curr_ym}-01"
+            cursor.execute("UPDATE transactions SET date = ? WHERE id = ?", (new_date, r["id"]))
+        conn.commit()
+        if len(rows) > 0:
+            print(f"Refreshed {len(rows)} transactions to current active month ({curr_ym}) for demo.")
+            
+    # Also ensure monthly_config exists for current month
+    cursor.execute("SELECT COUNT(*) FROM monthly_config WHERE month = ?", (curr_ym,))
+    if cursor.fetchone()[0] == 0:
+        cursor.execute(
+            "INSERT OR REPLACE INTO monthly_config (month, monthly_income, needs_target_pct, wants_target_pct, savings_target_pct) VALUES (?, ?, ?, ?, ?)",
+            (curr_ym, 3850.0, 50.0, 30.0, 20.0)
+        )
+        conn.commit()
+        
+    if close_at_end:
+        conn.close()
 
 def seed_database():
     init_db()
@@ -10,7 +58,7 @@ def seed_database():
     # Check if categories already exist
     cursor.execute("SELECT COUNT(*) FROM categories")
     if cursor.fetchone()[0] > 0:
-        print("Data already seeded.")
+        ensure_current_month_data(conn)
         conn.close()
         return
 

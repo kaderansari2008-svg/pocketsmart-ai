@@ -14,11 +14,18 @@ class PocketSmartAI:
     def get_financial_summary(self, target_month=None):
         """Calculates current month cashflow, category expenditures, and 50/30/20 metrics."""
         now = datetime.now()
-        if not target_month:
-            target_month = now.strftime("%Y-%m")
-            
         conn = self.get_db()
         cursor = conn.cursor()
+
+        if not target_month:
+            curr_ym = now.strftime("%Y-%m")
+            cursor.execute("SELECT COUNT(*) FROM transactions WHERE strftime('%Y-%m', date) = ?", (curr_ym,))
+            if cursor.fetchone()[0] > 0:
+                target_month = curr_ym
+            else:
+                cursor.execute("SELECT strftime('%Y-%m', date) as m FROM transactions GROUP BY m ORDER BY m DESC LIMIT 1")
+                row = cursor.fetchone()
+                target_month = row["m"] if row and row["m"] else curr_ym
         
         # Monthly config
         cursor.execute("SELECT * FROM monthly_config WHERE month = ?", (target_month,))
