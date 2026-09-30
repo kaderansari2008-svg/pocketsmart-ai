@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PocketSmart AI: Your Smart Budget & Recommendation Assistant</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="4"></rect>
+            <path d="M16 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
+            <path d="m2 10 20 0"></path>
+            <path d="M6 16h2"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">PocketSmart <span class="ai-badge">AI</span></div>
+          <div class="brand-subtitle">Smart Budget & Recommendation Assistant</div>
+        </div>
+      </div>
+
+      <!-- Financial Health Quick Badge -->
+      <div class="health-pill" id="headerHealthPill" title="Your live financial health index">
+        <span class="pulse-dot"></span>
+        <span id="headerHealthText">Health Score: 85/100 (Strong)</span>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="nav-actions">
+        <button class="btn btn-secondary btn-icon" id="voiceInputBtn" title="Speak to log transaction">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="22"></line>
+          </svg>
+          <span>Voice Log</span>
+        </button>
+
+        <button class="btn btn-primary" id="openAddTxBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Log Expense</span>
+        </button>
+
+        <button class="btn btn-ghost btn-icon-only" id="themeToggleBtn" title="Toggle theme">
+          <svg id="themeMoonIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="sub-nav">
+      <div class="tabs-container">
+        <button class="tab-btn active" data-tab="dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+            <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+            <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+            <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+          </svg>
+          Dashboard & 50/30/20
+        </button>
+        <button class="tab-btn" data-tab="affordability">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          Can I Afford This? <span class="pill-sparkle">AI Co-Pilot</span>
+        </button>
+        <button class="tab-btn" data-tab="advisor">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"></path>
+          </svg>
+          AI Financial Advisor
+        </button>
+        <button class="tab-btn" data-tab="transactions">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          Transactions
+        </button>
+        <button class="tab-btn" data-tab="goals-subs">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="6"></circle>
+            <circle cx="12" cy="12" r="2"></circle>
+          </svg>
+          Goals & Subscriptions
+        </button>
+      </div>
+
+      <div class="sub-nav-right">
+        <button class="btn btn-ghost btn-sm" id="resetDemoBtn" title="Reset sample demo transactions">
+          ↺ Reset Demo Data
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- TAB 1: DASHBOARD & 50/30/20 -->
+      <section id="tab-dashboard" class="tab-pane active">
+        <!-- Overview Key Metric Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card card-glow-emerald">
+            <div class="metric-header">
+              <span class="metric-label">Monthly Inflow</span>
+              <span class="metric-icon bg-emerald">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+              </span>
+            </div>
+            <div class="metric-value text-emerald" id="statIncome">$0.00</div>
+            <div class="metric-caption">Expected & received salary</div>
+          </div>
+
+          <div class="metric-card card-glow-indigo">
+            <div class="metric-header">
+              <span class="metric-label">Monthly Expenses</span>
+              <span class="metric-icon bg-indigo">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 5 7 7-7 7"/><path d="M5 12h14"/></svg>
+              </span>
+            </div>
+            <div class="metric-value text-indigo" id="statExpenses">$0.00</div>
+            <div class="metric-caption" id="statBurnRate">Daily burn: $0.00/day</div>
+          </div>
+
+          <div class="metric-card card-glow-cyan">
+            <div class="metric-header">
+              <span class="metric-label">Remaining Surplus</span>
+              <span class="metric-icon bg-cyan">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+              </span>
+            </div>
+            <div class="metric-value text-cyan" id="statSurplus">$0.00</div>
+            <div class="metric-caption" id="statDaysLeft">0 days left in billing cycle</div>
+          </div>
+
+          <div class="metric-card card-glow-purple">
+            <div class="metric-header">
+              <span class="metric-label">Savings Rate</span>
+              <span class="metric-icon bg-purple">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              </span>
+            </div>
+            <div class="metric-value text-purple" id="statSavingsRate">0.0%</div>
+            <div class="metric-caption" id="statSavingsBenchmark">Target: ≥ 20.0%</div>
+          </div>
+        </div>
+
+        <!-- 50/30/20 Visual Benchmark Rule Section -->
+        <div class="card rule-section-card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">The 50 / 30 / 20 Budget Rule Tracker</h2>
+              <p class="card-subtitle">AI-guided allocation: 50% Essentials (Needs), 30% Lifestyle (Wants), 20% Wealth & Savings.</p>
+            </div>
+            <div class="rule-benchmark-badge" id="ruleAdherenceBadge">Evaluating...</div>
+          </div>
+
+          <div class="rule-bars-grid">
+            <!-- Needs Bar (50%) -->
+            <div class="rule-col">
+              <div class="rule-col-header">
+                <div class="rule-title-wrap">
+                  <span class="rule-pill pill-needs">50% Needs</span>
+                  <span class="rule-name">Essentials & Bills</span>
+                </div>
+                <div class="rule-amounts">
+                  <span class="rule-spent" id="needsSpentText">$0</span>
+                  <span class="rule-target" id="needsTargetText">/ $0 target</span>
+                </div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill fill-needs" id="needsProgressBar" style="width: 0%"></div>
+              </div>
+              <div class="rule-foot" id="needsStatusMsg">Housing, groceries, transit, utilities</div>
+            </div>
+
+            <!-- Wants Bar (30%) -->
+            <div class="rule-col">
+              <div class="rule-col-header">
+                <div class="rule-title-wrap">
+                  <span class="rule-pill pill-wants">30% Wants</span>
+                  <span class="rule-name">Discretionary & Dining</span>
+                </div>
+                <div class="rule-amounts">
+                  <span class="rule-spent" id="wantsSpentText">$0</span>
+                  <span class="rule-target" id="wantsTargetText">/ $0 target</span>
+                </div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill fill-wants" id="wantsProgressBar" style="width: 0%"></div>
+              </div>
+              <div class="rule-foot" id="wantsStatusMsg">Dining out, entertainment, shopping</div>
+            </div>
+
+            <!-- Savings Bar (20%) -->
+            <div class="rule-col">
+              <div class="rule-col-header">
+                <div class="rule-title-wrap">
+                  <span class="rule-pill pill-savings">20% Savings</span>
+                  <span class="rule-name">Wealth & Emergency</span>
+                </div>
+                <div class="rule-amounts">
+                  <span class="rule-spent" id="savingsSpentText">$0</span>
+                  <span class="rule-target" id="savingsTargetText">/ $0 target</span>
+                </div>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill fill-savings" id="savingsProgressBar" style="width: 0%"></div>
+              </div>
+              <div class="rule-foot" id="savingsStatusMsg">Emergency cushion, investments, DCA</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two Column: Category Breakdown & Spending Velocity Insights -->
+        <div class="two-col-grid">
+          <!-- Categories Breakdown Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Category Spending & Limits</h3>
+                <p class="card-subtitle">Real-time consumption vs monthly caps</p>
+              </div>
+            </div>
+            <div class="category-list" id="categoryListContainer">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- AI Financial Health & Velocity Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">PocketSmart Velocity & Diagnostics</h3>
+                <p class="card-subtitle">Burn rate projection & risk indicators</p>
+              </div>
+            </div>
+
+            <div class="velocity-box">
+              <div class="velocity-stat">
+                <span class="label">Projected Month-End Spend</span>
+                <span class="value text-indigo" id="velocityProjectedSpend">$0.00</span>
+              </div>
+              <div class="velocity-stat">
+                <span class="label">Projected Net Surplus</span>
+                <span class="value text-emerald" id="velocityProjectedSurplus">$0.00</span>
+              </div>
+            </div>
+
+            <div class="ai-insight-box">
+              <div class="insight-header">
+                <span class="ai-spark-icon">✨</span>
+                <strong>PocketSmart AI Smart Insight</strong>
+              </div>
+              <div class="insight-body" id="dashboardAiInsightText">
+                Analyzing your real-time cashflow and spend velocity...
+              </div>
+            </div>
+
+            <div class="quick-prompts-card">
+              <div class="prompt-header">Try Asking PocketSmart AI:</div>
+              <div class="prompt-chips">
+                <button class="prompt-chip" data-query="How can I optimize my monthly budget?">💡 Optimize Budget</button>
+                <button class="prompt-chip" data-query="Am I overspending on dining out?">🍔 Dining Out Check</button>
+                <button class="prompt-chip" data-query="What is my emergency fund status?">🛡️ Emergency Buffer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: "CAN I AFFORD THIS?" AI EVALUATOR -->
+      <section id="tab-affordability" class="tab-pane">
+        <div class="affordability-hero">
+          <div class="hero-left">
+            <div class="badge-hero">
+              <span class="hero-icon">✨</span>
+              <span>PocketSmart AI Decision Co-Pilot</span>
+            </div>
+            <h1 class="hero-title">Can I Afford This Purchase?</h1>
+            <p class="hero-desc">
+              Make confident, guilt-free buying decisions. PocketSmart AI cross-references your current cashflow, category limit, upcoming fixed bills, and time until payday to calculate your exact <strong>Affordability Score</strong> and smart alternatives.
+            </p>
+
+            <form id="affordabilityForm" class="affordability-form">
+              <div class="form-row">
+                <div class="form-group flex-2">
+                  <label for="affordItemName">Item or Experience Name</label>
+                  <input type="text" id="affordItemName" class="form-control" placeholder="e.g. Sony WH-1000XM5 Headphones, Weekend Trip, iPad Air" required>
+                </div>
+                <div class="form-group flex-1">
+                  <label for="affordPrice">Cost ($ USD)</label>
+                  <input type="number" id="affordPrice" class="form-control" placeholder="349.00" step="0.01" min="1" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="affordCategory">Category</label>
+                  <select id="affordCategory" class="form-control">
+                    <option value="Shopping & Gear">Shopping & Gear</option>
+                    <option value="Entertainment & Media">Entertainment & Media</option>
+                    <option value="Dining & Cafes">Dining & Cafes</option>
+                    <option value="Personal & Grooming">Personal & Grooming</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="Healthcare & Meds">Healthcare & Meds</option>
+                    <option value="Utilities & Bills">Utilities & Bills</option>
+                  </select>
+                </div>
+
+                <div class="form-group flex-1">
+                  <label for="affordUrgency">Urgency / Intent</label>
+                  <select id="affordUrgency" class="form-control">
+                    <option value="nice_to_have">Nice to Have (Planned Want)</option>
+                    <option value="essential_need">Essential Need (Urgent / Required)</option>
+                    <option value="impulse_want">Impulse Want (Spur of the moment)</option>
+                  </select>
+                </div>
+
+                <div class="form-group flex-1">
+                  <label for="affordInstallments">Payment Strategy</label>
+                  <select id="affordInstallments" class="form-control">
+                    <option value="1">1x Full Payment</option>
+                    <option value="3">Split over 3 Months</option>
+                    <option value="6">Split over 6 Months</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg btn-block" id="runAffordabilityBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+                <span>Run PocketSmart AI Evaluation</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Affordability Output Panel -->
+          <div class="hero-right">
+            <div class="eval-result-card" id="evalResultCard">
+              <div class="eval-placeholder" id="evalPlaceholder">
+                <div class="placeholder-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path>
+                  </svg>
+                </div>
+                <h3>Ready to Evaluate</h3>
+                <p>Fill out the purchase details on the left to see your real-time Affordability Score, cashflow impact, and tailored guidance.</p>
+                <div class="quick-examples">
+                  <span>Quick Test:</span>
+                  <button type="button" class="btn-sample-eval" data-item="AirPods Max" data-price="479" data-cat="Shopping & Gear">🎧 AirPods Max ($479)</button>
+                  <button type="button" class="btn-sample-eval" data-item="Weekend Cabin Getaway" data-price="250" data-cat="Entertainment & Media">🌲 Weekend Cabin ($250)</button>
+                </div>
+              </div>
+
+              <!-- Live Evaluated Result Box (Hidden by default) -->
+              <div class="eval-content hidden" id="evalContent">
+                <div class="eval-badge-header">
+                  <span class="verdict-pill" id="evalVerdictPill">Safe to Buy</span>
+                  <span class="eval-score-text" id="evalScoreValue">88 / 100</span>
+                </div>
+
+                <div class="eval-headline" id="evalHeadline">
+                  Yes, you can comfortably afford this!
+                </div>
+
+                <!-- Gauge Bar -->
+                <div class="gauge-container">
+                  <div class="gauge-track">
+                    <div class="gauge-fill" id="evalGaugeFill" style="width: 88%"></div>
+                  </div>
+                  <div class="gauge-labels">
+                    <span>High Risk</span>
+                    <span>Caution</span>
+                    <span>Guilt-Free</span>
+                  </div>
+                </div>
+
+                <!-- Reasons & Logic -->
+                <div class="eval-section">
+                  <div class="eval-section-title">📊 Cashflow Impact Analysis</div>
+                  <ul class="eval-bullets" id="evalReasonsList">
+                    <!-- Dynamic -->
+                  </ul>
+                </div>
+
+                <!-- Actionable Recommendations & Alternatives -->
+                <div class="eval-section">
+                  <div class="eval-section-title">💡 PocketSmart AI Action Plan</div>
+                  <ul class="eval-bullets text-recommend" id="evalRecsList">
+                    <!-- Dynamic -->
+                  </ul>
+                </div>
+
+                <div class="eval-footer-actions">
+                  <button class="btn btn-secondary btn-sm" id="logApprovedPurchaseBtn">
+                    + Log as Expense
+                  </button>
+                  <button class="btn btn-ghost btn-sm" id="createGoalFromEvalBtn">
+                    🎯 Turn into Savings Goal
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Evaluated Purchases History -->
+        <div class="card mt-6">
+          <div class="card-header">
+            <h3 class="card-title">Recent Affordability Evaluations</h3>
+            <span class="card-subtitle">Your historical purchase decisions and AI recommendations</span>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Item Name</th>
+                  <th>Price</th>
+                  <th>Category</th>
+                  <th>Verdict</th>
+                  <th>Score</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="affordHistoryTbody">
+                <tr><td colspan="6" class="text-center py-4">Loading history...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: AI FINANCIAL ADVISOR -->
+      <section id="tab-advisor" class="tab-pane">
+        <div class="advisor-container">
+          <div class="advisor-header-card card">
+            <div class="advisor-title-row">
+              <div class="ai-avatar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+              </div>
+              <div>
+                <h2>PocketSmart AI Financial Co-Pilot</h2>
+                <p>Your interactive personal finance advisor. Ask about savings tactics, debt reduction, budget limits, or spending habit reviews.</p>
+              </div>
+            </div>
+            
+            <!-- Model Engine Selector & Optional API Key -->
+            <div class="engine-bar">
+              <div class="engine-mode">
+                <span class="engine-tag">Engine: Built-in Heuristics + Gemini 1.5 Flash</span>
+              </div>
+              <div class="api-key-input-wrap">
+                <input type="password" id="geminiApiKeyInput" class="form-control form-control-sm" placeholder="Optional: Gemini API Key (leaves blank for built-in AI)">
+                <button class="btn btn-secondary btn-sm" id="saveApiKeyBtn">Set Key</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat Messages Area -->
+          <div class="chat-card card">
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-msg ai-msg">
+                <div class="msg-bubble">
+                  👋 <strong>Hello! I am PocketSmart AI</strong>, your personal finance and budgeting assistant. 
+                  I continuously analyze your income, current month expenses, category allowances, and 50/30/20 distribution.
+                  <br><br>
+                  How can I help you optimize your money today? Pick a quick prompt below or type your question:
+                </div>
+              </div>
+            </div>
+
+            <!-- Suggested Prompt Chips -->
+            <div class="chat-suggestions">
+              <button class="chip" data-chat="How can I save $200 more this month?">💰 How to save $200 this month?</button>
+              <button class="chip" data-chat="Evaluate my 50/30/20 budget distribution">📊 Review my 50/30/20 balance</button>
+              <button class="chip" data-chat="Which subscriptions should I cancel?">✂️ Identify subscription leaks</button>
+              <button class="chip" data-chat="How is my daily burn rate looking?">🔥 Check daily burn rate</button>
+            </div>
+
+            <!-- Chat Input Box -->
+            <form id="chatForm" class="chat-input-bar">
+              <input type="text" id="chatInput" class="form-control" placeholder="Ask PocketSmart AI anything about your money, budget, or goals..." autocomplete="off" required>
+              <button type="submit" class="btn btn-primary" id="chatSendBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <span>Send</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: TRANSACTIONS -->
+      <section id="tab-transactions" class="tab-pane">
+        <div class="card">
+          <div class="card-header flex-between">
+            <div>
+              <h2 class="card-title">Transaction Ledger</h2>
+              <p class="card-subtitle">All logged expenses, deposits, and transfers</p>
+            </div>
+            <div class="filter-controls">
+              <input type="text" id="txSearchInput" class="form-control form-control-sm" placeholder="Search merchant or note...">
+              <select id="txTypeFilter" class="form-control form-control-sm">
+                <option value="all">All Types</option>
+                <option value="expense">Expenses Only</option>
+                <option value="income">Income Only</option>
+              </select>
+              <button class="btn btn-primary btn-sm" id="addTxFromTabBtn">+ Add Transaction</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Merchant / Entity</th>
+                  <th>Category</th>
+                  <th>Method</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="txTableBody">
+                <tr><td colspan="7" class="text-center py-4">Loading transactions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: GOALS & SUBSCRIPTIONS -->
+      <section id="tab-goals-subs" class="tab-pane">
+        <div class="two-col-grid">
+          
+          <!-- Savings Goals Column -->
+          <div class="card">
+            <div class="card-header flex-between">
+              <div>
+                <h3 class="card-title">Target Savings Goals</h3>
+                <p class="card-subtitle">Milestones & emergency funds</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="openNewGoalModalBtn">+ New Goal</button>
+            </div>
+            <div class="goals-list" id="goalsListContainer">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Subscription Leakage Column -->
+          <div class="card">
+            <div class="card-header flex-between">
+              <div>
+                <h3 class="card-title">Recurring Bills & Subscriptions</h3>
+                <p class="card-subtitle">AI Subscription Leakage Detector</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="openNewSubModalBtn">+ New Sub</button>
+            </div>
+
+            <div class="subscription-leak-banner" id="subLeakBanner">
+              <div class="leak-icon">🔍</div>
+              <div class="leak-info">
+                <span class="leak-label">Total Annual Subscription Drain</span>
+                <span class="leak-value text-red" id="annualLeakValue">$0.00 / year</span>
+              </div>
+            </div>
+
+            <div class="sub-list" id="subListContainer">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: ADD TRANSACTION (WITH NATURAL LANGUAGE PARSER) -->
+  <dialog class="modal" id="addTxModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Log Transaction</h3>
+        <button class="btn-close" id="closeAddTxModalBtn">&times;</button>
+      </div>
+
+      <!-- Natural Language Quick Entry Box -->
+      <div class="nl-entry-box">
+        <label for="nlTxInput" class="nl-label">
+          <span>✨ Natural Language Quick Log</span>
+          <span class="nl-hint">Type or paste, e.g. "Dinner at Chipotle $18.50" or "Paid electricity bill $90"</span>
+        </label>
+        <div class="nl-input-row">
+          <input type="text" id="nlTxInput" class="form-control" placeholder="e.g. Spent $32 on groceries at Trader Joe's">
+          <button type="button" class="btn btn-secondary" id="parseNlBtn">Parse</button>
+        </div>
+      </div>
+
+      <div class="divider"><span>OR FILL DETAILS</span></div>
+
+      <form id="manualTxForm">
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="txType">Type</label>
+            <select id="txType" class="form-control" required>
+              <option value="expense">Expense</option>
+              <option value="income">Income / Deposit</option>
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label for="txAmount">Amount ($)</label>
+            <input type="number" id="txAmount" class="form-control" step="0.01" min="0.01" placeholder="0.00" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="txCategory">Category</label>
+            <select id="txCategory" class="form-control" required>
+              <option value="Groceries">Groceries</option>
+              <option value="Dining & Cafes">Dining & Cafes</option>
+              <option value="Housing & Rent">Housing & Rent</option>
+              <option value="Utilities & Bills">Utilities & Bills</option>
+              <option value="Transportation">Transportation</option>
+              <option value="Shopping & Gear">Shopping & Gear</option>
+              <option value="Healthcare & Meds">Healthcare & Meds</option>
+              <option value="Entertainment & Media">Entertainment & Media</option>
+              <option value="Investments">Investments</option>
+              <option value="Emergency Fund">Emergency Fund</option>
+              <option value="Salary">Salary</option>
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label for="txMerchant">Merchant / Entity</label>
+            <input type="text" id="txMerchant" class="form-control" placeholder="e.g. Target, Uber, Chevron" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="txDate">Date</label>
+            <input type="date" id="txDate" class="form-control" required>
+          </div>
+          <div class="form-group flex-1">
+            <label for="txPaymentMethod">Payment Method</label>
+            <select id="txPaymentMethod" class="form-control">
+              <option value="Card">Credit/Debit Card</option>
+              <option value="Apple Pay">Apple / Google Pay</option>
+              <option value="Bank Transfer">Bank Transfer / ACH</option>
+              <option value="Cash">Cash</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="txNote">Note / Description (Optional)</label>
+          <input type="text" id="txNote" class="form-control" placeholder="Extra notes or tags">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelAddTxBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveTxBtn">Save Transaction</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- MODAL: VOICE INPUT LISTENER -->
+  <dialog class="modal" id="voiceModal">
+    <div class="modal-box text-center">
+      <div class="modal-header">
+        <h3>🎙️ PocketSmart Voice Assistant</h3>
+        <button class="btn-close" id="closeVoiceModalBtn">&times;</button>
+      </div>
+
+      <div class="voice-anim-container">
+        <div class="mic-wave" id="micWaveRing"></div>
+        <div class="mic-icon-circle">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+        </div>
+      </div>
+
+      <div class="voice-status" id="voiceStatusText">Listening... Speak now</div>
+      <div class="voice-transcript" id="voiceTranscriptBox">"Spent 15 dollars on coffee at Starbucks"</div>
+
+      <div class="voice-actions">
+        <button class="btn btn-secondary" id="stopVoiceBtn">Stop Listening</button>
+        <button class="btn btn-primary" id="processVoiceBtn">Process & Log</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- MODAL: ADD SAVINGS GOAL -->
+  <dialog class="modal" id="newGoalModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Create New Savings Goal</h3>
+        <button class="btn-close" id="closeGoalModalBtn">&times;</button>
+      </div>
+      <form id="newGoalForm">
+        <div class="form-group">
+          <label for="goalName">Goal Name</label>
+          <input type="text" id="goalName" class="form-control" placeholder="e.g. MacBook Pro, Trip to Tokyo, Car Downpayment" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="goalTarget">Target Amount ($)</label>
+            <input type="number" id="goalTarget" class="form-control" step="10" placeholder="1500" required>
+          </div>
+          <div class="form-group flex-1">
+            <label for="goalCurrent">Current Saved ($)</label>
+            <input type="number" id="goalCurrent" class="form-control" step="10" placeholder="200" value="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="goalDate">Target Date (Optional)</label>
+          <input type="date" id="goalDate" class="form-control">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelGoalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Goal</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- MODAL: ADD SUBSCRIPTION -->
+  <dialog class="modal" id="newSubModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Add Subscription / Recurring Bill</h3>
+        <button class="btn-close" id="closeSubModalBtn">&times;</button>
+      </div>
+      <form id="newSubForm">
+        <div class="form-group">
+          <label for="subName">Service Name</label>
+          <input type="text" id="subName" class="form-control" placeholder="e.g. Netflix, Spotify, Gym, Cloud Storage" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="subCost">Cost ($)</label>
+            <input type="number" id="subCost" class="form-control" step="0.01" placeholder="15.99" required>
+          </div>
+          <div class="form-group flex-1">
+            <label for="subCycle">Billing Cycle</label>
+            <select id="subCycle" class="form-control">
+              <option value="monthly">Monthly</option>
+              <option value="annual">Annual</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="subCategory">Category</label>
+          <select id="subCategory" class="form-control">
+            <option value="Entertainment & Media">Entertainment & Media</option>
+            <option value="Healthcare & Meds">Healthcare & Meds</option>
+            <option value="Utilities & Bills">Utilities & Bills</option>
+            <option value="Shopping & Gear">Shopping & Gear</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelSubBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Subscription</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
