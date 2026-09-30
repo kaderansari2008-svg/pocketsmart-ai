@@ -86,29 +86,40 @@ pocketsmart-ai/
 
 ## ⚡ Quick Start Guide
 
-### 1. Launch the Application
-Run the launcher script from the project directory:
+### 🚀 Running in Visual Studio Code (Recommended)
+1. Open this repository folder in **VS Code**: `File > Open Folder...`
+2. Press **`F5`** (or click the green Play button in the top right / Run & Debug menu).
+3. VS Code will automatically start `main.py` and open your default browser directly at **`http://localhost:8080/`**!
 
+### 💻 Running from Terminal
+Run the primary entrypoint:
 ```bash
-cd /Users/mohammedabuthakirm/.gemini/antigravity/scratch/pocketsmart-ai
-./run.sh
+python3 main.py
 ```
+*(Or use `python3 main.py --no-browser` to run headlessly, or `python3 main.py 8081` to pick a custom port)*
 
-*(Or run directly with Python on any desired port: `python3 backend/server.py 8080`)*
+---
 
-### 2. Open in Your Browser
-Navigate to:
-```
-http://localhost:8080/
-```
+## 🎬 2-Minute Demo Video Recording Guide
 
-### 3. Explore Pre-Loaded Features
-- View the pre-seeded **Dashboard** with realistic income, rent, groceries, and dining.
-- Switch to the **Can I Afford This?** tab and test evaluating items like `Sony Headphones ($350)` or `Weekend Trip ($400)`.
-- Use the **Voice Log** or **Log Expense** modal to test natural language entry (e.g., *"Spent $18.50 on lunch at Chipotle"*).
-- Chat with the **AI Financial Advisor** to get tailored savings plans.
+When recording your presentation or demo video (e.g., using Loom, OBS, or QuickTime Screen Recording), follow this high-impact walkthrough:
+
+| Timestamp | Screen / Action | Voiceover / Talking Point |
+| :--- | :--- | :--- |
+| **0:00 - 0:25** | **Dashboard View** | *"Welcome to PocketSmart AI — an intelligent budget and recommendation assistant. Unlike static budgeting apps, PocketSmart AI proactively guides your financial health using the 50/30/20 rule, real-time burn-rate forecasting, and smart purchase evaluation."* |
+| **0:25 - 0:55** | **"Can I Afford This?" Evaluator** | *"Here is the hero feature: 'Can I Afford This?'. Before buying a $350 pair of Sony Headphones, PocketSmart analyzes my real-time discretionary surplus, remaining days, and emergency buffer. Let's click 'Evaluate Affordability'. PocketSmart AI immediately returns an 85/100 score with a 'Safe to Buy' verdict and instant saving strategies."* |
+| **0:55 - 1:20** | **Voice & Natural Language Logging** | *"Expense tracking is zero-friction. Watch me click the microphone or type in natural English: 'Spent 28 dollars on Uber rides'. PocketSmart automatically categorizes it under Transit, parses the exact dollar amount, and logs it with one click."* |
+| **1:20 - 1:45** | **AI Financial Co-Pilot (Chat)** | *"Need personalized advice? Open the AI Financial Advisor. Clicking 'How can I save $200 more this month?' immediately analyzes my subscriptions and category spending to generate an actionable savings breakdown."* |
+| **1:45 - 2:00** | **Wrap Up & Architecture** | *"PocketSmart AI is built with clean Python standard library architecture, zero mandatory external dependencies, and an interactive glassmorphism UI. Thank you!"* |
+
+---
+
+## 🌐 Live Deployments & Repository
+- **GitHub Repository:** [https://github.com/kaderansari2008-svg/pocketsmart-ai](https://github.com/kaderansari2008-svg/pocketsmart-ai)
+- **Live Preview (GitHub Pages):** [https://kaderansari2008-svg.github.io/pocketsmart-ai/](https://kaderansari2008-svg.github.io/pocketsmart-ai/)
 
 ---
 
 ## 🛡️ License
 MIT License. Open-source educational and personal finance assistant.
+
